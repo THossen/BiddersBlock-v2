@@ -29,34 +29,44 @@ const LiveBids = ({ itemID, refreshKey }) => {
 
   return (
     <section className="mx-auto w-full max-w-xl">
-      <h2 className="mb-4 text-xl font-semibold text-slate-900">Bid history</h2>
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-2xl font-black text-slate-900">Bid history</h2>
+        <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-indigo-700">
+          Live
+        </span>
+      </div>
+
       {bids.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-slate-300 p-6 text-center text-slate-500">
-          No bids yet. Be the first to bid.
-        </p>
+        <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-8 text-center shadow-inner shadow-slate-200/50">
+          <p className="text-lg font-semibold text-slate-700">No bids yet</p>
+          <p className="mt-2 text-sm text-slate-500">Be the first to place a bid and kick off the auction.</p>
+        </div>
       ) : (
-        <ul className="divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+        <ul className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_28px_rgba(15,23,42,0.05)]">
           {bids.map((b, i) => (
             <li
               key={b.id}
-              className="flex items-center justify-between px-4 py-3"
+              className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-3 last:border-b-0"
             >
-              <span className="text-slate-800">
-                {b.userName || `User ${b.bidderID}`}
-                {i === 0 && (
-                  <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
-                    Leading
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="truncate font-semibold text-slate-800">
+                    {b.userName || `User ${b.bidderID}`}
                   </span>
-                )}
-              </span>
-              <span className="text-right">
-                <span className="block font-semibold text-slate-900">
+                  {i === 0 && (
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-800">
+                      Leading
+                    </span>
+                  )}
+                </div>
+                <span className="mt-1 block text-xs text-slate-500">{when(b.bid_time)}</span>
+              </div>
+
+              <div className="text-right">
+                <span className="block text-lg font-black text-slate-900">
                   ${Number(b.bidAmount).toLocaleString()}
                 </span>
-                <span className="block text-xs text-slate-500">
-                  {when(b.bid_time)}
-                </span>
-              </span>
+              </div>
             </li>
           ))}
         </ul>
