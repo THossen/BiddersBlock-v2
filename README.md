@@ -92,10 +92,5 @@ biddersblock/
 - [ ] **Payments and auction close**: winners are computed from the data, but there is no checkout or notification step.
 - [ ] **Tests**: no automated tests yet.
 
-## Team
 
-Built as a team project by Tanvir Hossen (lead, front end and back end), Isaac Ortega and Robert Chu (back end), and Darnell Voltaire and Saiyedal Alam (front end).
 
-## License
-
-No license has been chosen yet. Add a `LICENSE` file (for example MIT) before sharing the code publicly.
