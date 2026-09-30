@@ -1,0 +1,5 @@
+node_modules/
+client/build/
+server/mysqlite.db
+.env
+.DS_Store
