@@ -3,8 +3,10 @@ import { useState, useEffect } from "react";
 const format = (ms) => {
   if (ms <= 0) return "Auction ended";
   const s = Math.floor(ms / 1000);
-  const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600);
-  const m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const d = Math.floor(s / 86400),
+    h = Math.floor((s % 86400) / 3600);
+  const m = Math.floor((s % 3600) / 60),
+    sec = s % 60;
   return `${d}d ${h}h ${m}m ${sec}s`;
 };
 
