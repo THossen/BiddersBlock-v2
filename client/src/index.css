@@ -2,4 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-body { @apply bg-slate-50 text-slate-800 antialiased; }
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply min-h-screen bg-slate-50 text-slate-800 antialiased;
+  background-image:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(244, 114, 182, 0.12), transparent 22%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+#root {
+  @apply min-h-screen;
+}

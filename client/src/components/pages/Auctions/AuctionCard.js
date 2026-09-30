@@ -10,31 +10,33 @@ const STATUS = {
 
 function AuctionCard({ itemPicture, itemName, itemDescription, highestPrice, startingPrice, auctionEndTime, status }) {
   const [label, tone] = STATUS[status];
+
   return (
     <article
-      className={`group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md ${
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(79,70,229,0.12)] ${
         status === "ended" ? "opacity-75" : ""
       }`}
     >
-      <div className="relative aspect-[4/3] bg-slate-100">
+      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
         <img
           src={itemPicture}
           alt={itemName}
           loading="lazy"
-          className={`h-full w-full object-cover ${status === "ended" ? "grayscale" : ""}`}
+          className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${status === "ended" ? "grayscale" : ""}`}
           onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
         />
-        <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-semibold ${tone}`}>{label}</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent" />
+        <span className={`absolute left-3 top-3 rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] ${tone}`}>{label}</span>
       </div>
       <div className="flex flex-1 flex-col p-4">
-        <h3 className="text-lg font-semibold text-slate-900">{itemName}</h3>
-        <p className="mt-1 line-clamp-2 text-sm text-slate-600">{itemDescription}</p>
-        <div className="mt-auto flex items-end justify-between pt-4">
+        <h3 className="text-lg font-bold text-slate-900">{itemName}</h3>
+        <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-600">{itemDescription}</p>
+        <div className="mt-auto flex items-end justify-between gap-3 pt-4">
           <div>
-            <p className="text-xs text-slate-500">{highestPrice ? "Current bid" : "Starting bid"}</p>
-            <p className="text-xl font-bold text-slate-900">{money(highestPrice || startingPrice)}</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500">{highestPrice ? "Current bid" : "Starting bid"}</p>
+            <p className="mt-1 text-xl font-black text-slate-900">{money(highestPrice || startingPrice)}</p>
           </div>
-          <p className="text-right text-xs text-slate-500">
+          <p className="text-right text-[11px] text-slate-500">
             {status === "ended" ? "Ended" : "Ends"} {fmt(auctionEndTime)}
           </p>
         </div>

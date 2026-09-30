@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const input =
-  "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500";
+  "mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100";
 
 const FIELDS = [
   ["userFirstname", "First name", "text", "given-name"],
@@ -38,11 +38,15 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex justify-center bg-slate-50 px-4 py-12">
-      <form onSubmit={submit} className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Already registered? <Link to="/LoginPage" className="font-medium text-violet-700 hover:underline">Log in</Link>
+    <div className="relative flex justify-center px-4 py-12 sm:py-16">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-100 via-sky-100 to-pink-100" />
+      <form onSubmit={submit} className="w-full max-w-2xl rounded-[2rem] border border-slate-200/80 bg-white/80 p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] backdrop-blur sm:p-8">
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600">Join today</p>
+          <h1 className="mt-2 text-3xl font-black text-slate-900">Create your account</h1>
+        </div>
+        <p className="text-sm text-slate-600">
+          Already registered? <Link to="/LoginPage" className="font-medium text-indigo-600 hover:underline">Log in</Link>
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {FIELDS.map(([key, label, type, ac]) => (
@@ -56,7 +60,7 @@ const RegisterPage = () => {
         </div>
         {error && <p role="alert" className="mt-4 text-sm text-rose-700">{error}</p>}
         <button disabled={busy}
-          className="mt-6 w-full rounded-lg bg-violet-900 py-2.5 font-semibold text-white hover:bg-violet-800 disabled:opacity-50">
+          className="mt-6 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 font-semibold text-white shadow-lg shadow-violet-200 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60">
           {busy ? "Creating account…" : "Create account"}
         </button>
       </form>
