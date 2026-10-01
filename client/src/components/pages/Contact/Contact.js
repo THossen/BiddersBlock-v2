@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../../api";
 
 const input =
   "mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100";
@@ -13,7 +13,7 @@ const Contact = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:3001/add-contact", form);
+      await api.post("/add-contact", form);
       setForm(blank);
       setStatus({ ok: true, text: "Thanks, we've received your message." });
     } catch {

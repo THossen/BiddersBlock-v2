@@ -11,7 +11,7 @@ const btn =
   "rounded-full px-4 py-2 text-sm font-semibold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300";
 
 const NavBar = () => {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -29,7 +29,7 @@ const NavBar = () => {
 
         <nav className="flex items-center gap-2 sm:gap-3">
           <NavLink to="/Auctions" className={navLink}>Auctions</NavLink>
-          {!user ? (
+          {loading ? null : !user ? (
             <>
               <Link to="/LoginPage" className={`${btn} text-slate-200 hover:bg-white/5 hover:text-white`}>
                 Log in

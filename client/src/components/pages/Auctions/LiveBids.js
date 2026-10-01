@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { io } from "socket.io-client";
+import api, { API_BASE_URL } from "../../../api";
 
 const when = (s) =>
   new Date(s).toLocaleString("en-US", {
@@ -9,23 +10,37 @@ const when = (s) =>
     minute: "2-digit",
   });
 
-const LiveBids = ({ itemID, refreshKey }) => {
+const LiveBids = ({ itemID }) => {
   const [bids, setBids] = useState([]);
 
   useEffect(() => {
-    let live = true;
-    const load = () =>
-      axios
-        .get(`http://localhost:3001/latest-bids/${itemID}`)
-        .then((r) => live && setBids(r.data.bids))
-        .catch(console.error);
-    load();
-    const t = setInterval(load, 3000);
-    return () => {
-      live = false;
-      clearInterval(t);
+    let active = true;
+    const mergeBids = (incoming) => {
+      setBids((current) => {
+        const unique = new Map([...incoming, ...current].map((bid) => [bid.id, bid]));
+        return [...unique.values()].sort((a, b) => b.id - a.id).slice(0, 10);
+      });
     };
-  }, [itemID, refreshKey]);
+    const load = () => api
+      .get(`/latest-bids/${itemID}`)
+      .then((response) => { if (active) mergeBids(response.data.bids); })
+      .catch(console.error);
+    const socket = io(API_BASE_URL, {
+      withCredentials: true,
+      transports: ["websocket"],
+    });
+    socket.on("connect", () => {
+      socket.emit("auction:join", Number(itemID));
+      load();
+    });
+    socket.on("bid:created", (bid) => mergeBids([bid]));
+    socket.on("connect_error", console.error);
+    load();
+    return () => {
+      active = false;
+      socket.disconnect();
+    };
+  }, [itemID]);
 
   return (
     <section className="mx-auto w-full max-w-xl">

@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { AuthContext } from "../../../Providers/AuthContext";
+import api from "../../../api";
 
 const input =
   "mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100";
@@ -20,7 +20,7 @@ const LoginPage = () => {
     setError("");
     setBusy(true);
     try {
-      const { data } = await axios.post("http://localhost:3001/login", form);
+      const { data } = await api.post("/login", form);
       login(data.user);
       navigate("/ProfilePage");
     } catch (err) {

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../../api";
 
 const input =
   "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500";
 const empty = { itemName: "", itemDescription: "", itemPicture: "", startingPrice: "", auctionStartTime: "", auctionEndTime: "" };
 
-const AddAuctionForm = ({ onAuctionAdded, userID }) => {
+const AddAuctionForm = ({ onAuctionAdded }) => {
   const navigate = useNavigate();
   const [form, setForm] = useState(empty);
   const [error, setError] = useState("");
@@ -21,9 +21,8 @@ const AddAuctionForm = ({ onAuctionAdded, userID }) => {
     if (end <= new Date()) return setError("The end time must be in the future.");
     setBusy(true);
     try {
-      await axios.post("http://localhost:3001/add-auction", {
+      await api.post("/add-auction", {
         ...form,
-        sellerID: userID,
         auctionStartTime: start.toISOString(), // sends an unambiguous time, not a local string
         auctionEndTime: end.toISOString(),
       });

@@ -4,7 +4,7 @@ import { AuctionContext } from "../../../Providers/AuctionContext";
 import useCountdown from "../../../Providers/useCountdown";
 import LiveBids from "./LiveBids";
 import useAuth from "../../../Providers/useAuth";
-import axios from "axios";
+import api from "../../../api";
 
 function AuctionDetailsPage() {
   const { id } = useParams();
@@ -14,7 +14,6 @@ function AuctionDetailsPage() {
   const [highestPrice, setHighestPrice] = useState(null);
   const [message, setMessage] = useState(null); // { type: "error" | "success", text }
   const [busy, setBusy] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const auction = auctionData.find((a) => a.itemID === parseInt(id));
   useEffect(() => { if (auction) setHighestPrice(auction.highestPrice); }, [auction]);
@@ -30,7 +29,7 @@ function AuctionDetailsPage() {
 
   const { itemName, itemDescription, startingPrice, itemPicture } = auction;
   const min = highestPrice ? Number(highestPrice) + 1 : Number(startingPrice);
-  const isSeller = user && user.userID === auction.sellerID;
+  const isSeller = user && Number(user.userID) === Number(auction.sellerID);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -38,12 +37,11 @@ function AuctionDetailsPage() {
     if (Number(newBid) < min) return setMessage({ type: "error", text: `Your bid must be at least $${min}.` });
     setBusy(true);
     try {
-      const { data } = await axios.post("http://localhost:3001/add-bid", {
-        bidderID: user.userID, itemID: auction.itemID, bidAmount: newBid,
+      const { data } = await api.post("/add-bid", {
+        itemID: auction.itemID, bidAmount: newBid,
       });
       setHighestPrice(data.highestPrice);
       setNewBid("");
-      setRefreshKey((k) => k + 1);
       setMessage({ type: "success", text: "Bid placed. You're the highest bidder." });
     } catch (err) {
       const r = err.response?.data;
@@ -98,7 +96,7 @@ function AuctionDetailsPage() {
           )}
         </div>
       </div>
-      <div className="mt-12"><LiveBids itemID={id} refreshKey={refreshKey} /></div>
+      <div className="mt-12"><LiveBids itemID={id} /></div>
     </div>
   );
 }

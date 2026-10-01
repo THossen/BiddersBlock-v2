@@ -19,7 +19,7 @@ const STEPS = [
 
 const LandingPage = () => {
   const { auctionData } = useContext(AuctionContext);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const now = new Date();
   const endingSoon = auctionData
     .filter(
@@ -54,7 +54,7 @@ const LandingPage = () => {
                 >
                   Browse auctions
                 </Link>
-                {!user ? (
+                {loading ? null : !user ? (
                   <Link
                     to="/RegisterPage"
                     className="rounded-xl border border-white/20 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10"

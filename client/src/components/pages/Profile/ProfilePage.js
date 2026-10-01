@@ -1,9 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { Routes, Route, NavLink, Navigate, Link } from "react-router-dom";
-import axios from "axios";
 import AddAuctionForm from "../Auctions/AddAuctionForm";
 import { AuctionContext } from "../../../Providers/AuctionContext";
 import useAuth from "../../../Providers/useAuth";
+import api from "../../../api";
 
 const TABS = [
   ["/ProfilePage", "Overview", true],
@@ -165,8 +165,8 @@ const MyListings = ({ auctions, userID }) => {
 const ProfileOverview = ({ user, auctions }) => {
   const [won, setWon] = useState(null);
   useEffect(() => {
-    axios
-      .get(`http://localhost:3001/won-auctions/${user.userID}`)
+    api
+      .get("/won-auctions")
       .then((response) => setWon(response.data.auctions))
       .catch(() => setWon([]));
   }, [user.userID]);
@@ -317,17 +317,42 @@ const ProfileOverview = ({ user, auctions }) => {
 
 const AuctionsWon = ({ user }) => {
   const [won, setWon] = useState(null);
+  const [orders, setOrders] = useState({});
+  const [ordersLoaded, setOrdersLoaded] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(null);
+  const [checkoutError, setCheckoutError] = useState("");
   useEffect(() => {
-    axios
-      .get(`http://localhost:3001/won-auctions/${user.userID}`)
+    api
+      .get("/won-auctions")
       .then((r) => setWon(r.data.auctions))
       .catch(() => setWon([]));
+    api
+      .get("/my-orders")
+      .then((r) => setOrders(Object.fromEntries(r.data.orders.map((order) => [order.itemID, order]))))
+      .catch(() => setOrders({}))
+      .finally(() => setOrdersLoaded(true));
   }, [user.userID]);
+
+  const completeDemoCheckout = async (itemID) => {
+    setCheckingOut(itemID);
+    setCheckoutError("");
+    try {
+      const { data } = await api.post(`/checkout/${itemID}`);
+      setOrders((current) => ({ ...current, [itemID]: data.order }));
+    } catch (error) {
+      setCheckoutError(error.response?.data?.error || "Demo checkout could not be completed.");
+    } finally {
+      setCheckingOut(null);
+    }
+  };
 
   return (
     <section>
       <div className="mb-5 flex items-center justify-between gap-4">
-        <h2 className="text-2xl font-black text-slate-900">Auctions won</h2>
+        <div>
+          <h2 className="text-2xl font-black text-slate-900">Auctions won</h2>
+          <p className="mt-1 text-sm text-slate-500">Demo checkout records an order only; no payment is processed.</p>
+        </div>
         <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-700">
           {won?.length ?? 0} total
         </span>
@@ -343,38 +368,56 @@ const AuctionsWon = ({ user }) => {
           </p>
         </div>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2">
-          {won.map((a) => (
+        <>
+          {checkoutError && <p role="alert" className="mb-4 text-sm text-rose-700">{checkoutError}</p>}
+          <div className="grid gap-5 sm:grid-cols-2">
+          {won.map((auction) => (
             <article
-              key={a.itemID}
+              key={auction.itemID}
               className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_12px_28px_rgba(15,23,42,0.05)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(79,70,229,0.12)]"
             >
               <img
-                src={a.itemPicture}
-                alt={a.itemName}
+                src={auction.itemPicture}
+                alt={auction.itemName}
                 className="aspect-[4/3] w-full object-cover"
               />
               <div className="p-4">
-                <h3 className="font-bold text-slate-900">{a.itemName}</h3>
+                <h3 className="font-bold text-slate-900">{auction.itemName}</h3>
                 <p className="mt-2 text-sm text-slate-600">
                   Won for{" "}
                   <span className="font-bold text-slate-900">
-                    ${a.highestPrice}
+                    {money(auction.highestPrice)}
                   </span>{" "}
-                  on {new Date(a.auctionEndTime).toLocaleDateString()}
+                  on {new Date(auction.auctionEndTime).toLocaleDateString()}
                 </p>
+                {orders[auction.itemID] ? (
+                  <p role="status" className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-medium text-emerald-800">
+                    Demo order #{orders[auction.itemID].orderID} confirmed. No payment was processed.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={!ordersLoaded || checkingOut === auction.itemID}
+                    onClick={() => completeDemoCheckout(auction.itemID)}
+                    className="mt-4 w-full rounded-lg bg-indigo-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-800 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {checkingOut === auction.itemID ? "Completing…" : `Complete demo checkout · ${money(auction.highestPrice)}`}
+                  </button>
+                )}
               </div>
             </article>
           ))}
-        </div>
+          </div>
+        </>
       )}
     </section>
   );
 };
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { auctionData, fetchData } = useContext(AuctionContext);
+  if (loading) return <p className="p-12 text-center text-slate-500">Checking your session…</p>;
   if (!user) return <Navigate to="/LoginPage" replace />;
 
   return (
@@ -426,12 +469,7 @@ const ProfilePage = () => {
             <Route path="Account" element={<UserInfo user={user} />} />
             <Route
               path="AddAuctionForm"
-              element={
-                <AddAuctionForm
-                  onAuctionAdded={fetchData}
-                  userID={user.userID}
-                />
-              }
+              element={<AddAuctionForm onAuctionAdded={fetchData} />}
             />
           </Routes>
         </main>

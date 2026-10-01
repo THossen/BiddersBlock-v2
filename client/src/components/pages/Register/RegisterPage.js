@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../../api";
 
 const input =
   "mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100";
@@ -30,7 +30,7 @@ const RegisterPage = () => {
     setBusy(true);
     try {
       const { confirm, ...payload } = form;
-      await axios.post("http://localhost:3001/register", payload);
+      await api.post("/register", payload);
       navigate("/LoginPage");
     } catch (err) {
       setError(err.response?.data?.error || "We couldn't create your account. Please try again.");

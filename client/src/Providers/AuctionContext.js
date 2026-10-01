@@ -1,6 +1,6 @@
 // AuctionContextProvider.js
 import { useState, useEffect, createContext, useCallback } from "react";
-import axios from "axios";
+import api from "../api";
 
 export const AuctionContext = createContext();
 
@@ -9,7 +9,7 @@ const AuctionContextProvider = ({ children }) => {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await axios.get("http://localhost:3001/auctions");
+      const response = await api.get("/auctions");
       setAuctionData(response.data.auctions);
     } catch (error) {
       console.error("Error fetching auction data:", error);

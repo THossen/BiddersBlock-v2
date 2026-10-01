@@ -11,9 +11,25 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "socket.io-client": "^4.8.4"
   },
-  "devDependencies": { "autoprefixer": "^10.4.19", "postcss": "^8.4.38", "tailwindcss": "^3.4.4" },
-  "scripts": { "start": "react-scripts start", "build": "react-scripts build" },
-  "browserslist": { "production": [">0.2%", "not dead"], "development": ["last 1 chrome version"] }
+  "devDependencies": {
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead"
+    ],
+    "development": [
+      "last 1 chrome version"
+    ]
+  }
 }

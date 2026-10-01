@@ -1,40 +1,39 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import api from "../api";
 
 const AuthContext = createContext({
   user: null,
+  loading: true,
   login: () => {},
   logout: () => {},
 });
-const KEY = "bb_user";
-
-// Keeps the user signed in across page refreshes.
-// This only remembers who they are; real security still needs server-side sessions/JWTs.
-const load = () => {
-  try {
-    return JSON.parse(localStorage.getItem(KEY));
-  } catch {
-    return null;
-  }
-};
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(load);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const login = (userData) => {
-    setUser(userData);
+  useEffect(() => {
+    let active = true;
+    api.get("/auth/me")
+      .then(({ data }) => { if (active) setUser(data.user); })
+      .catch(() => { if (active) setUser(null); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  const login = (userData) => setUser(userData);
+  const logout = async () => {
     try {
-      localStorage.setItem(KEY, JSON.stringify(userData));
-    } catch {}
-  };
-  const logout = () => {
-    setUser(null);
-    try {
-      localStorage.removeItem(KEY);
-    } catch {}
+      await api.post("/logout");
+    } catch {
+      // Clear the local view even if the API is temporarily unavailable.
+    } finally {
+      setUser(null);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
