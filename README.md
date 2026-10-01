@@ -4,7 +4,7 @@
 
 ### A full-stack auction marketplace
 
-Browse listings, place competitive bids, and manage auctions from a responsive React app backed by an Express API and SQLite.
+Browse listings, place competitive bids, and manage auctions from a responsive React app backed by an Express API and PostgreSQL.
 
 <p>
     <img src="https://img.shields.io/badge/React-18-149eca?logo=react&logoColor=white" alt="React 18" />
@@ -21,7 +21,7 @@ Browse listings, place competitive bids, and manage auctions from a responsive R
 
 ## Overview
 
-BiddersBlock is a college-project marketplace app built around the core auction workflow: sellers create timed listings, buyers compete with bids, and the platform tracks the current leader and completed wins. It pairs a responsive React interface with an Express API, SQLite, cookie-based sessions, and Socket.IO.
+BiddersBlock is a college-project marketplace app built around the core auction workflow: sellers create timed listings, buyers compete with bids, and the platform tracks the current leader and completed wins. It pairs a responsive React interface with an Express API, PostgreSQL, cookie-based sessions, and Socket.IO.
 
 ## Highlights
 
@@ -30,7 +30,7 @@ BiddersBlock is a college-project marketplace app built around the core auction 
 - Search and browse auctions with Live, Upcoming, and Ended filters, plus price and end-time sorting.
 - View bid activity update live through Socket.IO.
 - Enforce bidding rules on the server, including minimum prices, auction timing, and preventing sellers from bidding on their own items.
-- Apply each bid with a conditional database update so competing requests cannot both become the highest bid.
+- Serialize competing bids with PostgreSQL row locks and transactions so only the current highest bid is accepted.
 
 ### Sell and manage
 
@@ -51,33 +51,44 @@ BiddersBlock is a college-project marketplace app built around the core auction 
 | --- | --- |
 | Front end | React 18, React Router 6, Tailwind CSS 3, Axios, Socket.IO Client |
 | Back end | Node.js, Express 4, express-session, Socket.IO |
-| Database | SQLite with `sqlite3` |
-| Authentication | bcrypt password hashing, HTTP-only session cookie |
+| Database | PostgreSQL with `pg`; SQLite is retained only for the one-time import tool |
+| Authentication | bcrypt password hashing, HTTP-only session cookie stored in PostgreSQL |
 
 ## Run locally
 
-Requires **Node.js 18 or later**. Copy each `.env.example` to `.env`, then start the API and client in separate terminals from the repository root.
+Requires **Node.js 18 or later** and Docker Desktop. From the repository root, start PostgreSQL and copy the example environment files:
+
+```powershell
+docker compose up -d
+Copy-Item server/.env.example server/.env
+Copy-Item client/.env.example client/.env
+```
+
+The local PostgreSQL database uses a Docker volume, so its contents survive container restarts. The volume belongs to this computer and is not included in Git.
 
 **1. Start the API**
 
 ```bash
 cd server
 npm install
-cp .env.example .env
-npm run seed   # Optional: add a demo seller and sample auctions
+npm run migrate:sqlite  # One-time import if server/mysqlite.db exists
+npm run seed            # Optional and safe to rerun; adds missing demo data
 npm start      # http://localhost:3001
 ```
+
+If you do not have an existing `server/mysqlite.db`, skip `migrate:sqlite` and run `npm run seed` to create the demo data. The import refuses to run if PostgreSQL already contains application records, and leaves the SQLite source untouched.
 
 **2. Start the client**
 
 ```bash
 cd client
 npm install
-cp .env.example .env
 npm start      # http://localhost:3000
 ```
 
-Set `SESSION_SECRET` in `server/.env` to a long random value. Set `REACT_APP_API_URL` in `client/.env` if your API is not at `http://localhost:3001`. Restart the corresponding dev server after changing environment files. The backend accepts other localhost ports during development.
+Replace `SESSION_SECRET` in `server/.env` with a long random value. Set `REACT_APP_API_URL` in `client/.env` if your API is not at `http://localhost:3001`. Restart the corresponding dev server after changing environment files. The backend accepts other localhost ports during development.
+
+Stop PostgreSQL with `docker compose down`; the named data volume is kept. Avoid `docker compose down -v` unless you intentionally want to delete the local database.
 
 The seed script creates a demo seller account: **`demo` / `Demo!1234`**. Register another account to place bids, since sellers cannot bid on their own auctions.
 
@@ -86,12 +97,9 @@ Checkout is deliberately a demo workflow: it creates a `demo-confirmed` order re
 <details>
 <summary>Existing database note</summary>
 
-Place the database at `server/mysqlite.db`. Missing tables are created on startup. If your existing `items` table does not include the bid-tracking columns, add them with:
+When upgrading an older project, keep `server/mysqlite.db` in place and run `npm run migrate:sqlite` once to copy users, auctions, bids, orders, contacts, and roles into PostgreSQL. The SQLite file is not deleted or modified.
 
-```sql
-ALTER TABLE items ADD COLUMN highestPrice REAL;
-ALTER TABLE items ADD COLUMN currentBidderID INTEGER;
-```
+To use the same database on another computer, migrate or restore a database backup there. The local Docker volume itself does not sync between computers.
 
 </details>
 
@@ -99,6 +107,7 @@ ALTER TABLE items ADD COLUMN currentBidderID INTEGER;
 
 ```text
 biddersblock/
+├── docker-compose.yml       # Local PostgreSQL service and persistent volume
 ├── client/
 │   └── src/
 │       ├── api.js             # Shared API URL and cookie-enabled Axios client
@@ -107,8 +116,10 @@ biddersblock/
 │           ├── layout/       # Navigation, page body, and footer
 │           └── pages/        # Auctions, profiles, auth, contact, and about
 └── server/
-    ├── server.js             # Express API, sessions, and Socket.IO events
-    ├── schema.js             # SQLite table definitions
+    ├── server.js             # API entry point
+    ├── pg-server.js          # Express API, PostgreSQL sessions, and Socket.IO
+    ├── schema.js             # PostgreSQL table definitions
+    ├── migrate-sqlite.js     # One-time SQLite data importer
     └── seed.js               # Demo account and auction data
 ```
 
@@ -136,12 +147,10 @@ The Socket.IO client joins an auction room with `auction:join` and receives acce
 
 ## Security & roadmap
 
-This project is intended for a college portfolio/demo, not real transactions. It now uses server-managed sessions for protected auction actions, but the default session store is in-memory and sessions are lost when the server restarts. Use a persistent session store, HTTPS, CSRF protections, and deployment-specific secrets before any public deployment.
+This project is intended for a demo, not real transactions. Sessions are stored in PostgreSQL and survive API restarts. Before a public deployment, configure HTTPS, CSRF protections, rate limiting, and deployment-specific secrets. Checkout is simulated and does not handle payments.
 
-- [ ] Replace the demo in-memory session store with a persistent store for deployment.
 - [ ] Integrate a payment provider and verified webhooks if real checkout is needed; current checkout is simulated.
 - [ ] Add winner notifications and a complete auction close workflow.
-- [ ] Add automated tests for the API and core auction rules.
 - [ ] Add automated tests for the API and core auction rules.
 
 
