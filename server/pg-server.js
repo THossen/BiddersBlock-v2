@@ -305,6 +305,24 @@ app.get("/my-orders", requireAuth, h(async (req, res) => {
   res.json({ orders: await all("SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC", [req.session.userID]) });
 }));
 
+app.get("/my-finances", requireAuth, h(async (req, res) => {
+  const transactions = await all(
+    `SELECT o.order_id, o.item_id, o.item_name, o.amount, o.status, o.created_at,
+            'earning'::TEXT AS transaction_type
+     FROM orders o
+     JOIN items i ON i.item_id = o.item_id
+    WHERE i.seller_id = $1 AND o.status = 'demo-confirmed'
+     UNION ALL
+     SELECT o.order_id, o.item_id, o.item_name, o.amount, o.status, o.created_at,
+            'spending'::TEXT AS transaction_type
+     FROM orders o
+    WHERE o.user_id = $1 AND o.status = 'demo-confirmed'
+     ORDER BY created_at DESC`,
+    [req.session.userID]
+  );
+  res.json({ transactions });
+}));
+
 app.post("/checkout/:itemID", requireAuth, h(async (req, res) => {
   const itemID = Number(req.params.itemID);
   if (!Number.isInteger(itemID) || itemID <= 0) {

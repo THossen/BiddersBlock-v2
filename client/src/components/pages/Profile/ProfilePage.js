@@ -7,6 +7,7 @@ import MyBids from "./MyBids";
 import MyListings from "./MyListings";
 import AuctionsWon from "./AuctionsWon";
 import UserInfo from "./UserInfo";
+import Finances from "./Finances";
 import { useContext } from "react";
 
 const TABS = [
@@ -14,6 +15,7 @@ const TABS = [
   ["/ProfilePage/MyBids", "My bids"],
   ["/ProfilePage/MyListings", "My listings"],
   ["/ProfilePage/AuctionsWon", "Auctions won"],
+  ["/ProfilePage/Finances", "Earnings & spending"],
   ["/ProfilePage/Account", "Account"],
 ];
 
@@ -68,6 +70,7 @@ const ProfilePage = () => {
             />
             <Route path="MyBids" element={<MyBids />} />
             <Route path="AuctionsWon" element={<AuctionsWon user={user} />} />
+            <Route path="Finances" element={<Finances />} />
             <Route path="Account" element={<UserInfo user={user} />} />
             <Route
               path="AddAuctionForm"
