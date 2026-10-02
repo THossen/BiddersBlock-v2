@@ -6,6 +6,7 @@ const STATUS = {
   live: ["Live", "bg-emerald-100 text-emerald-800"],
   upcoming: ["Upcoming", "bg-amber-100 text-amber-800"],
   ended: ["Ended", "bg-slate-200 text-slate-700"],
+  endedNoBids: ["Ended · No bids", "bg-slate-200 text-slate-700"],
 };
 
 function AuctionCard({ itemPicture, itemName, itemDescription, highestPrice, startingPrice, auctionEndTime, status }) {
@@ -14,7 +15,7 @@ function AuctionCard({ itemPicture, itemName, itemDescription, highestPrice, sta
   return (
     <article
       className={`group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_10px_30px_rgba(15,23,42,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_38px_rgba(79,70,229,0.12)] ${
-        status === "ended" ? "opacity-75" : ""
+        status === "ended" || status === "endedNoBids" ? "opacity-75" : ""
       }`}
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
@@ -22,7 +23,7 @@ function AuctionCard({ itemPicture, itemName, itemDescription, highestPrice, sta
           src={itemPicture}
           alt={itemName}
           loading="lazy"
-          className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${status === "ended" ? "grayscale" : ""}`}
+          className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${status === "ended" || status === "endedNoBids" ? "grayscale" : ""}`}
           onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent" />
@@ -37,7 +38,7 @@ function AuctionCard({ itemPicture, itemName, itemDescription, highestPrice, sta
             <p className="mt-1 text-xl font-black text-slate-900">{money(highestPrice || startingPrice)}</p>
           </div>
           <p className="text-right text-[11px] text-slate-500">
-            {status === "ended" ? "Ended" : "Ends"} {fmt(auctionEndTime)}
+            {status === "ended" || status === "endedNoBids" ? "Ended" : "Ends"} {fmt(auctionEndTime)}
           </p>
         </div>
       </div>

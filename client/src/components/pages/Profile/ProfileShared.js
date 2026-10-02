@@ -43,17 +43,19 @@ export const AuctionRows = ({ auctions, emptyTitle, emptyText, mode }) => {
                 {auction.itemName}
               </h3>
               {mode === "listing" && (
-                <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
-                    new Date(auction.auctionEndTime).getTime() <= Date.now()
-                      ? "bg-slate-100 text-slate-600"
-                      : new Date(auction.auctionStartTime).getTime() > Date.now()
-                        ? "bg-amber-50 text-amber-700"
-                        : "bg-emerald-50 text-emerald-700"
-                  }`}
-                >
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${
+                  new Date(auction.auctionEndTime).getTime() <= Date.now()
+                    ? auction.highestPrice == null && auction.currentBidderID == null
+                      ? "bg-amber-50 text-amber-700"
+                      : "bg-slate-100 text-slate-600"
+                    : new Date(auction.auctionStartTime).getTime() > Date.now()
+                      ? "bg-sky-50 text-sky-700"
+                      : "bg-emerald-50 text-emerald-700"
+                }`}>
                   {new Date(auction.auctionEndTime).getTime() <= Date.now()
-                    ? "Ended"
+                    ? auction.highestPrice == null && auction.currentBidderID == null
+                      ? "Ended · no bids"
+                      : "Ended · winner set"
                     : new Date(auction.auctionStartTime).getTime() > Date.now()
                       ? "Upcoming"
                       : "Live"}
@@ -83,6 +85,14 @@ export const AuctionRows = ({ auctions, emptyTitle, emptyText, mode }) => {
                   : `Ends ${dateLabel(auction.auctionEndTime)}`}
               </span>
             </div>
+            {mode === "listing" &&
+              new Date(auction.auctionEndTime).getTime() <= Date.now() &&
+              auction.highestPrice == null &&
+              auction.currentBidderID == null && (
+                <p className="mt-2 text-xs font-medium text-amber-700">
+                  No bids were placed. You can list it again with a different starting price or schedule.
+                </p>
+              )}
           </div>
           {mode === "leading" && (
             <span className="hidden h-fit rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 sm:inline-flex">

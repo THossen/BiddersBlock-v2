@@ -121,19 +121,23 @@ const Auctions = () => {
           </div>
         ) : (
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {shown.map((a) =>
-              a.status === "ended" ? (
-                <AuctionCard key={a.itemID} {...a} />
-              ) : (
+            {shown.map((auction) => {
+              const cardStatus =
+                auction.status === "ended" &&
+                auction.highestPrice == null &&
+                auction.currentBidderID == null
+                  ? "endedNoBids"
+                  : auction.status;
+              return (
                 <Link
-                  key={a.itemID}
-                  to={`/auctions/${a.itemID}`}
+                  key={auction.itemID}
+                  to={`/auctions/${auction.itemID}`}
                   className="block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
                 >
-                  <AuctionCard {...a} />
+                  <AuctionCard {...auction} status={cardStatus} />
                 </Link>
-              ),
-            )}
+              );
+            })}
           </div>
         )}
       </div>

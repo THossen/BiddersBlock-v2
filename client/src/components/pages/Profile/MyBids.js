@@ -14,8 +14,9 @@ const BID_FILTERS = [
 const BID_STATUS_STYLES = {
   leading: ["Leading", "bg-emerald-50 text-emerald-700"],
   outbid: ["Outbid", "bg-amber-50 text-amber-700"],
+  "outbid-ended": ["You were outbid", "bg-rose-50 text-rose-700"],
   won: ["Won", "bg-emerald-50 text-emerald-700"],
-  lost: ["Ended · not won", "bg-slate-100 text-slate-600"],
+  purchased: ["Purchased · demo", "bg-sky-50 text-sky-700"],
   upcoming: ["Upcoming", "bg-sky-50 text-sky-700"],
 };
 
@@ -37,14 +38,16 @@ const MyBids = () => {
   const visibleBids = (bids || []).filter((bid) => {
     if (filter === "active") return bid.auctionStatus !== "ended";
     if (filter === "ended") return bid.auctionStatus === "ended";
-    if (filter === "leading" || filter === "outbid") return bid.bidStatus === filter;
+    if (filter === "leading") return bid.bidStatus === filter;
+    if (filter === "outbid") return bid.bidStatus === "outbid" || bid.bidStatus === "outbid-ended";
     return true;
   });
   const filterCounts = Object.fromEntries(
     BID_FILTERS.map(([key]) => [key, (bids || []).filter((bid) => {
       if (key === "active") return bid.auctionStatus !== "ended";
       if (key === "ended") return bid.auctionStatus === "ended";
-      if (key === "leading" || key === "outbid") return bid.bidStatus === key;
+      if (key === "leading") return bid.bidStatus === key;
+      if (key === "outbid") return bid.bidStatus === "outbid" || bid.bidStatus === "outbid-ended";
       return true;
     }).length]),
   );
@@ -88,7 +91,7 @@ const MyBids = () => {
       ) : (
         <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
           {visibleBids.map((bid) => {
-            const [statusLabel, statusStyle] = BID_STATUS_STYLES[bid.bidStatus] || BID_STATUS_STYLES.lost;
+            const [statusLabel, statusStyle] = BID_STATUS_STYLES[bid.bidStatus] || BID_STATUS_STYLES.upcoming;
             return (
               <article key={bid.itemID} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
                 <img
@@ -112,12 +115,35 @@ const MyBids = () => {
                     </span>
                   </div>
                 </div>
-                <Link
-                  to={`/auctions/${bid.itemID}`}
-                  className="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-800"
-                >
-                  View auction
-                </Link>
+                {bid.bidStatus === "won" ? (
+                  <Link
+                    to="/ProfilePage/AuctionsWon"
+                    className="shrink-0 rounded-lg bg-indigo-700 px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-indigo-800"
+                  >
+                    Continue to checkout
+                  </Link>
+                ) : bid.bidStatus === "purchased" ? (
+                  <Link
+                    to="/ProfilePage/AuctionsWon"
+                    className="shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100"
+                  >
+                    View order #{bid.orderID}
+                  </Link>
+                ) : bid.bidStatus === "outbid-ended" ? (
+                  <Link
+                    to="/Auctions"
+                    className="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-800"
+                  >
+                    Browse auctions
+                  </Link>
+                ) : (
+                  <Link
+                    to={`/auctions/${bid.itemID}`}
+                    className="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-center text-sm font-semibold text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-800"
+                  >
+                    {bid.bidStatus === "outbid" ? "Raise your bid" : "View auction"}
+                  </Link>
+                )}
               </article>
             );
           })}

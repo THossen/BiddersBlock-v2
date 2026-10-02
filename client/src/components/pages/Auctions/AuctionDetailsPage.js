@@ -30,6 +30,10 @@ function AuctionDetailsPage() {
   const { itemName, itemDescription, startingPrice, itemPicture } = auction;
   const min = highestPrice ? Number(highestPrice) + 1 : Number(startingPrice);
   const isSeller = user && Number(user.userID) === Number(auction.sellerID);
+  const isEnded = timeLeft === "Auction ended";
+  const isUpcoming = new Date(auction.auctionStartTime) > new Date();
+  const hasBids = auction.highestPrice != null || auction.currentBidderID != null;
+  const isWinner = user && Number(user.userID) === Number(auction.currentBidderID);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -64,7 +68,45 @@ function AuctionDetailsPage() {
             <div><dt className="text-xs text-slate-500">Time left</dt><dd className="text-lg font-semibold text-rose-700">{timeLeft}</dd></div>
           </dl>
 
-          {!user ? (
+          {isEnded ? (
+            <div className={`mt-6 rounded-xl border p-5 ${hasBids ? isWinner ? "border-emerald-200 bg-emerald-50" : "border-slate-200 bg-slate-50" : "border-amber-200 bg-amber-50"}`}>
+              <p className={`text-xs font-bold uppercase tracking-[0.16em] ${isWinner ? "text-emerald-700" : hasBids ? "text-slate-500" : "text-amber-700"}`}>
+                {isWinner ? "Auction result" : hasBids ? "Auction closed" : "No bids"}
+              </p>
+              <h2 className="mt-1 text-xl font-black text-slate-900">
+                {isWinner ? "You won this auction" : hasBids ? "This auction has ended" : "Auction ended without bids"}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                {isWinner
+                  ? `You won with the highest bid of $${Number(auction.highestPrice).toLocaleString()}. Your win is ready in your profile.`
+                  : hasBids
+                    ? `The winning bid was $${Number(auction.highestPrice).toLocaleString()}. Browse current auctions to find another lot.`
+                    : "No one placed a bid on this lot. Browse current auctions or list another item."}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                {isWinner ? (
+                  <Link to="/ProfilePage/AuctionsWon" className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800">
+                    Continue to checkout
+                  </Link>
+                ) : isSeller && !hasBids ? (
+                  <Link to="/ProfilePage/AddAuctionForm" className="rounded-lg bg-indigo-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-800">
+                    List another item
+                  </Link>
+                ) : null}
+                <Link to="/Auctions" className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-indigo-300 hover:text-indigo-800">
+                  Browse auctions
+                </Link>
+              </div>
+            </div>
+          ) : isUpcoming ? (
+            <div className="mt-6 rounded-xl border border-sky-200 bg-sky-50 p-5">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-sky-700">Coming up</p>
+              <h2 className="mt-1 text-xl font-black text-slate-900">Bidding hasn’t opened yet</h2>
+              <p className="mt-2 text-sm text-slate-600">
+                This auction starts {new Date(auction.auctionStartTime).toLocaleString()}.
+              </p>
+            </div>
+          ) : !user ? (
             <p className="mt-6 rounded-lg bg-violet-50 p-4 text-violet-900">
               <Link to="/LoginPage" className="font-semibold underline">Log in</Link> or{" "}
               <Link to="/RegisterPage" className="font-semibold underline">sign up</Link> to place a bid.

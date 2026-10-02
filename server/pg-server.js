@@ -263,23 +263,26 @@ app.get("/my-bids", requireAuth, h(async (req, res) => {
     `SELECT
        item_id, item_picture, item_name, item_description, starting_price,
        current_bid_amount, highest_price, current_bidder_id,
-       auction_start_time, auction_end_time, user_bid_amount, last_bid_time,
+      auction_start_time, auction_end_time, user_bid_amount, last_bid_time, order_id,
        CASE
          WHEN auction_end_time <= NOW() THEN 'ended'
          WHEN auction_start_time > NOW() THEN 'upcoming'
          ELSE 'live'
        END AS "auctionStatus",
        CASE
+         WHEN auction_end_time <= NOW() AND current_bidder_id = $1 AND order_id IS NOT NULL THEN 'purchased'
          WHEN auction_end_time <= NOW() AND current_bidder_id = $1 THEN 'won'
-         WHEN auction_end_time <= NOW() THEN 'lost'
+         WHEN auction_end_time <= NOW() THEN 'outbid-ended'
          WHEN current_bidder_id = $1 THEN 'leading'
          ELSE 'outbid'
        END AS "bidStatus"
      FROM (
        SELECT DISTINCT ON (i.item_id)
-         i.*, b.bid_amount AS user_bid_amount, b.bid_time AS last_bid_time
+         i.*, b.bid_amount AS user_bid_amount, b.bid_time AS last_bid_time,
+         o.order_id AS order_id
        FROM bids b
        JOIN items i ON i.item_id = b.item_id
+       LEFT JOIN orders o ON o.item_id = i.item_id AND o.user_id = $1
        WHERE b.bidder_id = $1
        ORDER BY i.item_id, b.bid_id DESC
      ) latest_user_bids
