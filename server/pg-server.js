@@ -258,6 +258,37 @@ app.get("/latest-bids/:itemID", h(async (req, res) => {
   res.json({ bids });
 }));
 
+app.get("/my-bids", requireAuth, h(async (req, res) => {
+  const bids = await all(
+    `SELECT
+       item_id, item_picture, item_name, item_description, starting_price,
+       current_bid_amount, highest_price, current_bidder_id,
+       auction_start_time, auction_end_time, user_bid_amount, last_bid_time,
+       CASE
+         WHEN auction_end_time <= NOW() THEN 'ended'
+         WHEN auction_start_time > NOW() THEN 'upcoming'
+         ELSE 'live'
+       END AS "auctionStatus",
+       CASE
+         WHEN auction_end_time <= NOW() AND current_bidder_id = $1 THEN 'won'
+         WHEN auction_end_time <= NOW() THEN 'lost'
+         WHEN current_bidder_id = $1 THEN 'leading'
+         ELSE 'outbid'
+       END AS "bidStatus"
+     FROM (
+       SELECT DISTINCT ON (i.item_id)
+         i.*, b.bid_amount AS user_bid_amount, b.bid_time AS last_bid_time
+       FROM bids b
+       JOIN items i ON i.item_id = b.item_id
+       WHERE b.bidder_id = $1
+       ORDER BY i.item_id, b.bid_id DESC
+     ) latest_user_bids
+     ORDER BY last_bid_time DESC`,
+    [req.session.userID]
+  );
+  res.json({ bids });
+}));
+
 app.get("/won-auctions", requireAuth, h(async (req, res) => {
   const auctions = await all(
     `SELECT item_id, item_picture, item_name, item_description, highest_price, auction_end_time

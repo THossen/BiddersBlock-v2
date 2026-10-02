@@ -36,6 +36,7 @@ BiddersBlock is a college-project marketplace app built around the core auction 
 
 - Create timed listings with an image preview and date validation.
 - Review live listings, auctions currently led, completed wins, and account details in the profile area.
+- Track your latest bid per auction and filter active, leading, outbid, and ended results.
 - Register and sign in with bcrypt-hashed passwords and an HTTP-only server-managed session cookie.
 - Complete a **simulated checkout** for a won auction. This records a demo order only; no payment provider or real payment is involved.
 
@@ -136,6 +137,7 @@ biddersblock/
 | `DELETE` | `/delete-auction/:itemID` | Delete your own auction and its bids |
 | `POST` | `/add-bid` | Validate and place a bid as the signed-in user |
 | `GET` | `/latest-bids/:itemID` | Get the ten most recent bids |
+| `GET` | `/my-bids` | Get the signed-in user's latest bid per auction and current status |
 | `GET` | `/won-auctions` | Get the signed-in user's ended wins |
 | `GET` | `/my-orders` | Get the signed-in user's demo orders |
 | `POST` | `/checkout/:itemID` | Record a simulated checkout for a won auction |
