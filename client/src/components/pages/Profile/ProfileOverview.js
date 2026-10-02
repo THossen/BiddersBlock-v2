@@ -84,8 +84,8 @@ const ProfileOverview = ({ user, auctions }) => {
         ))}
       </section>
 
-      <div className="grid gap-7 lg:grid-cols-[1.25fr_0.75fr]">
-        <section>
+      <div className="grid min-w-0 gap-7 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
+        <section className="min-w-0">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-bold text-slate-900">
@@ -110,7 +110,7 @@ const ProfileOverview = ({ user, auctions }) => {
           />
         </section>
 
-        <section>
+        <section className="min-w-0">
           <div className="mb-3">
             <h2 className="text-lg font-bold text-slate-900">
               Auctions you're leading

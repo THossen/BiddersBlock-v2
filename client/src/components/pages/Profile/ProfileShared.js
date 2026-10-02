@@ -26,9 +26,9 @@ export const AuctionRows = ({ auctions, emptyTitle, emptyText, mode }) => {
   }
 
   return (
-    <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+    <div className="min-w-0 divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
       {auctions.map((auction) => (
-        <article key={auction.itemID} className="flex gap-4 p-4 sm:p-5">
+        <article key={auction.itemID} className="flex min-w-0 gap-4 p-4 sm:p-5">
           <img
             src={auction.itemPicture}
             alt={auction.itemName}
@@ -38,8 +38,8 @@ export const AuctionRows = ({ auctions, emptyTitle, emptyText, mode }) => {
             }}
           />
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="truncate font-bold text-slate-900">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <h3 title={auction.itemName} className="min-w-0 max-w-full truncate font-bold text-slate-900">
                 {auction.itemName}
               </h3>
               {mode === "listing" && (
