@@ -13,11 +13,18 @@ Browse listings, place competitive bids, and manage auctions from a responsive R
     <img src="https://img.shields.io/badge/SQLite-database-003b57?logo=sqlite&logoColor=white" alt="SQLite" />
 </p>
 
-<div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; margin-bottom: 20px;">
-    <img src="client/public/BiddersBlock%20Home%20View.png" width="32%" alt="BiddersBlock Home View" />
-    <img src="client/public/Auctions%20View.png" width="32%" alt="Auctions View" />
-    <img src="client/public/Earnings%20and%20Spending%20Dashboard.png" width="32%" alt="Earnings and Spending Dashboard" />
-</div>
+<img src="client/public/BiddersBlock%20Home%20View.png" width="100%" alt="BiddersBlock Home View" />
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="client/public/Auctions%20View.png" alt="Auctions View" />
+    </td>
+    <td width="50%">
+      <img src="client/public/Earnings%20and%20Spending%20Dashboard.png" alt="Earnings and Spending Dashboard" />
+    </td>
+  </tr>
+</table>
 
 [Features](#highlights) · [Tech stack](#tech-stack) · [Run locally](#run-locally) · [API](#api-reference) · [Roadmap](#security--roadmap)
 
