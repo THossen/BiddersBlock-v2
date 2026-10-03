@@ -14,9 +14,9 @@ Browse listings, place competitive bids, and manage auctions from a responsive R
 </p>
 
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; margin-bottom: 20px;">
-    <img src="biddersblock\client\public\BiddersBlock Home View.png" width="32%" alt="BiddersBlock Home View" />
-    <img src="biddersblock\client\public\Auctions and Details View.png" width="32%" alt="Auctions and Details View" />
-    <img src="biddersblock\client\public\Earnings and Spending Dashboard.png" width="32%" alt="Earnings and Spending Dashboard" />
+    <img src="client/public/BiddersBlock%20Home%20View.png" width="32%" alt="BiddersBlock Home View" />
+    <img src="client/public/Auctions%20and%20Details%20View.png" width="32%" alt="Auctions and Details View" />
+    <img src="client/public/Earnings%20and%20Spending%20Dashboard.png" width="32%" alt="Earnings and Spending Dashboard" />
 </div>
 
 [Features](#highlights) · [Tech stack](#tech-stack) · [Run locally](#run-locally) · [API](#api-reference) · [Roadmap](#security--roadmap)
