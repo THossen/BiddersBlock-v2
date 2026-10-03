@@ -25,7 +25,7 @@ const LandingHero = ({ user, loading }) => (
             Discover live deals
           </span>
           <h1 className="mt-6 max-w-xl text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl">
-            Bid on one-of-a-kind items. Win them at your price.
+            Bid on one-of-a-kind collectibles. Win them at your price.
           </h1>
           <p className="mt-5 max-w-lg text-lg text-violet-100">
             BiddersBlock is an online auction house where every bid updates live.
