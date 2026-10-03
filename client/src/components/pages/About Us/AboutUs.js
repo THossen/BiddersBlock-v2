@@ -2,7 +2,7 @@ const TEAM = [
   [
     "Tanvir Hossen",
     "Team Lead",
-    "Assigned the work and built across frontend and backend.",
+    "Delegated workflow and built features across frontend and backend.",
   ],
   [
     "Isaac Ortega",
